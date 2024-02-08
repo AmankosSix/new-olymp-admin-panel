@@ -34,11 +34,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Get Server Host Key
+        run: ssh-keyscan -t rsa ${{ secrets.SERVER_IP }} >> $HOME/.ssh/known_hosts
+
+      - name: Set Key Permissions
+        run: chmod 600 $HOME/.ssh/deploy_key
+
+      - name: Debugging Info
+        run: |
+          cat $HOME/.ssh/known_hosts
+          echo "SSH Command: ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} \"docker pull ${{ secrets.DOCKER_TEST_IMAGE }}\""
+
       - name: Deploy Test
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_TEST_IMAGE }} || true"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ secrets.DOCKER_TEST_IMAGE }} || true"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run -d -p 8080:8080 ${{ secrets.DOCKER_TEST_IMAGE }}"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_TEST_IMAGE }} || true"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ secrets.DOCKER_TEST_IMAGE }} || true"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run -d -p 8080:8080 ${{ secrets.DOCKER_TEST_IMAGE }}"
