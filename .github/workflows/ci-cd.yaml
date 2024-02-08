@@ -37,6 +37,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key-password: ${{ secrets.SSH_PRIVATE_KEY_PASSWORD }}
       - name: Deploy Test
         run: |
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
