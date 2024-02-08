@@ -24,6 +24,7 @@ class ApiService {
   public static init(app: App<Element>) {
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
+    ApiService.vueInstance.axios.defaults.baseURL = import.meta.env.VITE_APP_API_URL ?? '';
     ApiService.vueInstance.axios.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
@@ -75,9 +76,9 @@ class ApiService {
 
   /**
    * @description send the GET HTTP request
-   * @param resource: string
-   * @param params: AxiosRequestConfig
    * @returns Promise<AxiosResponse>
+   * @param resource
+   * @param params
    */
   public static query(resource: string, params: any): Promise<AxiosResponse> {
     return ApiService.vueInstance.axios.get(resource, params);
