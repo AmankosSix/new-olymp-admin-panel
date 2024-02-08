@@ -33,15 +33,13 @@ jobs:
       - name: Debug SSH Key and Passphrase
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/debug_key
-          echo "Passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}" > /tmp/debug_passphrase
+          echo "${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}" > /tmp/debug_passphrase
           cat /tmp/debug_key
           cat /tmp/debug_passphrase
 
       - name: Use SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          ssh-private-key-passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}" | ssh-add -
 
       - name: Deploy Test
         run: |
