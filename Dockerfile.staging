@@ -13,7 +13,7 @@ RUN yarn install
 COPY . .
 
 # Build the Vue.js application
-RUN yarn build:production
+RUN yarn build:staging
 
 # Stage 2: Create a smaller image for production
 FROM nginx:1.25-alpine

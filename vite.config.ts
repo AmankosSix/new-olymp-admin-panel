@@ -36,6 +36,7 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    host: true,
   },
   resolve: {
     alias: {

@@ -1,0 +1,50 @@
+pool:
+  name: digital-ocean
+
+trigger:
+  branches:
+    include:
+      - '*'
+
+stages:
+  - stage: 'build-test-image'
+    displayName: 'Build Test Image'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+    variables:
+      - name: IMAGE_TAG
+        value: $(Build.SourceBranchName)
+      - name: DOCKERFILE_PATH
+        value: ./Dockerfile.staging
+    jobs:
+      - job: 'build'
+        steps:
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                docker build -t ${{ variables.IMAGE_TAG }} -f ${{ variables.DOCKERFILE_PATH }} .
+      - job: 'publish'
+        steps:
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+                docker push ${{ variables.IMAGE_TAG }}
+                docker system prune -f
+
+  - stage: 'deploy-test'
+    displayName: 'Deploy Test'
+    dependsOn: 'build-test-image'
+    condition: succeeded()
+    jobs:
+      - job: 'deploy'
+        steps:
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull your-docker-image-name:${{ variables.IMAGE_TAG }}"
+                ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop your-container-name || true"
+                ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm your-container-name || true"
+                ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run -d --name your-container-name -p 80:your_exposed_port your-docker-image-name:${{ variables.IMAGE_TAG }}"
