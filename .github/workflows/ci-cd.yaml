@@ -16,12 +16,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 20
 
       - name: Build Test Image
         run: |
           docker build -t ${{ secrets.DOCKER_TEST_IMAGE }} -f ./Dockerfile.staging .
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker logout
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} docker.io
           docker push ${{ secrets.DOCKER_TEST_IMAGE }}
           docker system prune -f
 
