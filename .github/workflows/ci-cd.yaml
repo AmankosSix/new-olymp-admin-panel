@@ -87,6 +87,6 @@ jobs:
       - name: Deploy Prod
         run: |
           ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_PROD_IMAGE }}"
-          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_PROD_IMAGE }} || true"
-          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ secrets.DOCKER_PROD_IMAGE }} || true"
-          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run -d -p 8080:8080 ${{ secrets.DOCKER_PROD_IMAGE }}"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_PROD_IMAGE }}"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ secrets.DOCKER_PROD_IMAGE }}"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run -d -p 3000:8080 ${{ secrets.DOCKER_PROD_IMAGE }}"
