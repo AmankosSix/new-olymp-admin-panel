@@ -30,18 +30,21 @@ jobs:
     needs: build_test_image
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     steps:
-      - name: Debug SSH Key and Passphrase
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/debug_key
-          echo "${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}" > /tmp/debug_passphrase
-          cat /tmp/debug_key
-          cat /tmp/debug_passphrase
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Use SSH key
+      - name: Add droplet to SSH known hosts
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}" | ssh-add -
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "${{ secrets.SERVER_IP }} ${ssh-keyscan ${{ secrets.SERVER_IP }} 2>/dev/null}" >> ~/.ssh/known_hosts
 
       - name: Deploy Test
+        env:
+            SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+            SERVER_IP: ${{ secrets.SERVER_IP }}
+            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            SSH_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
         run: |
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_TEST_IMAGE }} || true"
