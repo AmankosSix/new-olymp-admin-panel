@@ -47,6 +47,7 @@ jobs:
             SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
             SSH_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
         run: |
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} docker.io"
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_TEST_IMAGE }} || true"
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ secrets.DOCKER_TEST_IMAGE }} || true"
