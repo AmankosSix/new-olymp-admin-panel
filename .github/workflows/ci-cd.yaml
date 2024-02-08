@@ -32,8 +32,14 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     steps:
       - name: Deploy Test
-        run: |
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_TEST_IMAGE }} || true"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ secrets.DOCKER_TEST_IMAGE }} || true"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run -d -p 8080:8080 ${{ secrets.DOCKER_TEST_IMAGE }}"
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            docker pull ${{ secrets.DOCKER_TEST_IMAGE }}
+            docker stop ${{ secrets.DOCKER_TEST_IMAGE }} || true
+            docker rm ${{ secrets.DOCKER_TEST_IMAGE }} || true
+            docker run -d -p 8080:8080 ${{ secrets.DOCKER_TEST_IMAGE }}
