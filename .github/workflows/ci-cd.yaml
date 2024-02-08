@@ -36,9 +36,10 @@ jobs:
 
       - name: Add droplet to SSH known hosts
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "${{ secrets.SERVER_IP }} ${ssh-keyscan ${{ secrets.SERVER_IP }} 2>/dev/null}" >> ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}" | ssh-agent bash -
+          ssh-add - <<<"${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}"
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy Test
         env:
