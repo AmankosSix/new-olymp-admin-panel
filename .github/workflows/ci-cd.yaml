@@ -3,11 +3,12 @@ name: CI/CD
 on:
   push:
     branches:
-      - 'develop'
+      - '*'
 
 jobs:
   build_test_image:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
