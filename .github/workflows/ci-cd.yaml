@@ -20,9 +20,9 @@ jobs:
 
       - name: Build Test Image
         run: |
-          docker build -t ${{ github.event.before }} -f ./Dockerfile.staging .
+          docker build -t ${{ secrets.DOCKER_TEST_IMAGE }} -f ./Dockerfile.staging .
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push ${{ github.event.before }}
+          docker push ${{ secrets.DOCKER_TEST_IMAGE }}
           docker system prune -f
 
   deploy_test:
@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Deploy Test
         run: |
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ github.event.before }}"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ github.event.before }} || true"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ github.event.before }} || true"
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run -d --name ${{ github.event.before }} -p 8080:8080 ${{ github.event.before }}"
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_TEST_IMAGE }} || true"
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ secrets.DOCKER_TEST_IMAGE }} || true"
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run -d -p 8080:8080 ${{ secrets.DOCKER_TEST_IMAGE }}"
