@@ -34,20 +34,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Add droplet to SSH known hosts
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "${{ secrets.SERVER_IP }} ${ssh-keyscan ${{ secrets.SERVER_IP }} 2>/dev/null}" >> ~/.ssh/known_hosts
-
       - name: Deploy Test
-        env:
-            SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-            SERVER_IP: ${{ secrets.SERVER_IP }}
-            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-            SSH_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
         run: |
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} docker.io"
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop ${{ secrets.DOCKER_TEST_IMAGE }} || true"
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm ${{ secrets.DOCKER_TEST_IMAGE }} || true"
