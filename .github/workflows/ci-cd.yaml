@@ -42,18 +42,18 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
+      - name: Clean up previous Docker image and containers
+        run: |
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker ps -a -q --filter ancestor=${{ secrets.DOCKER_TEST_IMAGE }} | xargs docker stop"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker ps -a -q --filter ancestor=${{ secrets.DOCKER_TEST_IMAGE }} | xargs docker rm"
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rmi ${{ secrets.DOCKER_TEST_IMAGE }}"
+
       - name: Deploy Test
         run: |
           ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_TEST_IMAGE }}"
           ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop olymp-admin-test || true"
           ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm olymp-admin-test || true"
           ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run --name olymp-admin-test -d -p 8080:80 ${{ secrets.DOCKER_TEST_IMAGE }}"
-
-      - name: Clean up previous Docker image and containers
-        run: |
-          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker ps -a -q --filter ancestor=${{ secrets.DOCKER_TEST_IMAGE }} | xargs docker stop"
-          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker ps -a -q --filter ancestor=${{ secrets.DOCKER_TEST_IMAGE }} | xargs docker rm"
-          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rmi ${{ secrets.DOCKER_TEST_IMAGE }}"
 
   build_prod_image:
     runs-on: ubuntu-latest
