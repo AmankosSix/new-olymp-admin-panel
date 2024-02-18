@@ -22,7 +22,7 @@ FROM nginx:1.25-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy the nginx configuration file (if needed)
-# COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose the port that the application will run on (default is 80 for nginx)
 EXPOSE 80
