@@ -92,3 +92,5 @@ jobs:
           ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop olymp-admin || true"
           ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm olymp-admin || true"
           ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker run --name olymp-admin -d -p 3000:80 ${{ secrets.DOCKER_PROD_IMAGE }}"
+          sleep 5  # Add a delay of 5 seconds
+          ssh -v ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker image prune -af"
